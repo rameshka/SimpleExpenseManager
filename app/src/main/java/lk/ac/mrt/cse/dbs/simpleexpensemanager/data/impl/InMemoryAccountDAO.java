@@ -16,6 +16,8 @@
 
 package lk.ac.mrt.cse.dbs.simpleexpensemanager.data.impl;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +61,7 @@ public class InMemoryAccountDAO implements AccountDAO {
     @Override
     public void addAccount(Account account) {
         accounts.put(account.getAccountNo(), account);
+        Log.i("Hash",Integer.toString(accounts.size()));
     }
 
     @Override

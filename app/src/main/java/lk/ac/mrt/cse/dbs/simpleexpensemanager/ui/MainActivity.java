@@ -27,10 +27,11 @@ import android.support.v7.widget.Toolbar;
 
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.R;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.control.ExpenseManager;
-import lk.ac.mrt.cse.dbs.simpleexpensemanager.control.InMemoryDemoExpenseManager;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.control.PersistanceStorageManager;
 
 public class MainActivity extends AppCompatActivity {
-    private ExpenseManager expenseManager;
+    private ExpenseManager expenseManagerPersistance;
+    //private ExpenseManager expenseManagerPersistance1;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -65,7 +66,8 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(mViewPager);
 
         /***  Begin generating dummy data for In-Memory implementation  ***/
-        expenseManager = new InMemoryDemoExpenseManager();
+        //expenseManagerPersistance = new InMemoryDemoExpenseManager();
+        expenseManagerPersistance  = new PersistanceStorageManager(this);
         /*** END ***/
     }
 
@@ -85,13 +87,13 @@ public class MainActivity extends AppCompatActivity {
             // Return the respective fragment.
             switch (position) {
                 case 0:
-                    return ManageExpensesFragment.newInstance(expenseManager);
+                    return ManageExpensesFragment.newInstance(expenseManagerPersistance);
                 case 1:
-                    return AddAccountFragment.newInstance(expenseManager);
+                    return AddAccountFragment.newInstance(expenseManagerPersistance);
                 case 2:
-                    return ExpenseLogsFragment.newInstance(expenseManager);
+                    return ExpenseLogsFragment.newInstance(expenseManagerPersistance);
                 default:
-                    return ManageExpensesFragment.newInstance(expenseManager);
+                    return ManageExpensesFragment.newInstance(expenseManagerPersistance);
             }
         }
 

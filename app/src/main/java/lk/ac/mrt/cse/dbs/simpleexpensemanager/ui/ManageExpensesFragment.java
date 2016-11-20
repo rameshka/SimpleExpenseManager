@@ -30,9 +30,11 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.R;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.control.ExpenseManager;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.control.PersistanceStorageManager;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.exception.InvalidAccountException;
 import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.ExpenseType;
 
@@ -47,6 +49,7 @@ public class ManageExpensesFragment extends Fragment implements View.OnClickList
     private RadioGroup expenseTypeGroup;
     private DatePicker datePicker;
     private ExpenseManager currentExpenseManager;
+    private Button refreshButton;
 
     public static ManageExpensesFragment newInstance(ExpenseManager expenseManager) {
         ManageExpensesFragment manageExpensesFragment = new ManageExpensesFragment();
@@ -65,6 +68,9 @@ public class ManageExpensesFragment extends Fragment implements View.OnClickList
         submitButton = (Button) rootView.findViewById(R.id.submit_amount);
         submitButton.setOnClickListener(this);
 
+        refreshButton = (Button) rootView.findViewById(R.id.refresh);
+        refreshButton.setOnClickListener(this);
+
         amount = (EditText) rootView.findViewById(R.id.amount);
         accountSelector = (Spinner) rootView.findViewById(R.id.account_selector);
         currentExpenseManager = (ExpenseManager) getArguments().get(EXPENSE_MANAGER);
@@ -80,6 +86,9 @@ public class ManageExpensesFragment extends Fragment implements View.OnClickList
         RadioButton expenseType = (RadioButton) rootView.findViewById(R.id.expense);
         RadioButton incomeType = (RadioButton) rootView.findViewById(R.id.income);
         datePicker = (DatePicker) rootView.findViewById(R.id.date_selector);
+
+        currentExpenseManager = (PersistanceStorageManager) getArguments().get(EXPENSE_MANAGER);
+
         return rootView;
     }
 
@@ -103,8 +112,34 @@ public class ManageExpensesFragment extends Fragment implements View.OnClickList
 
                 if (currentExpenseManager != null) {
                     try {
-                        currentExpenseManager.updateAccountBalance(selectedAccount, day, month, year,
-                                ExpenseType.valueOf(type.toUpperCase()), amountStr);
+
+                        //data  to being saved in the local memory
+                        if (selectedAccount!=null){
+                            currentExpenseManager.updateAccountBalance(selectedAccount, day, month, year,
+                                    ExpenseType.valueOf(type.toUpperCase()), amountStr);
+
+
+                        //data sent to database to being saved
+                        ((PersistanceStorageManager) currentExpenseManager).updateNewLog(selectedAccount, day, month, year,
+                                type.toUpperCase(), Double.parseDouble(amountStr));
+
+
+                        }
+
+                        //if account is not selected to enter transactions
+                        else if(selectedAccount==null){
+                            new AlertDialog.Builder(this.getActivity())
+                                    .setTitle("Select Valid account")
+                                    .setMessage("create account or select a valid account")
+                                    .setNeutralButton(this.getString(R.string.msg_ok),
+                                            new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.cancel();
+                                                }
+                                            }).setIcon(android.R.drawable.ic_dialog_alert).show();
+                        }
+
                     } catch (InvalidAccountException e) {
                         new AlertDialog.Builder(this.getActivity())
                                 .setTitle(this.getString(R.string.msg_account_update_unable) + selectedAccount)
@@ -120,6 +155,20 @@ public class ManageExpensesFragment extends Fragment implements View.OnClickList
                 }
                 amount.getText().clear();
                 break;
+
+            case R.id.refresh:
+                ArrayAdapter<String> adapter =
+                        null;
+                if (currentExpenseManager != null) {
+                    adapter = new ArrayAdapter<>(this.getActivity(), R.layout.support_simple_spinner_dropdown_item,
+                            currentExpenseManager.getAccountNumbersList());
+                }
+                accountSelector.setAdapter(adapter);
+
+
+                break;
+
+
         }
     }
 }

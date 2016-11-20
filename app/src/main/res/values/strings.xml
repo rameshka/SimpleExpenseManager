@@ -34,4 +34,5 @@
     <string name="label_manage">Manage</string>
     <string name="label_add_account">Add account</string>
     <string name="label_logs">Logs</string>
+    <string name="refresh">Refresh</string>
 </resources>

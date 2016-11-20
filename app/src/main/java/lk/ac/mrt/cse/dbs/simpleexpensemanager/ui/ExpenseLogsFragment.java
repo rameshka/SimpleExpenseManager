@@ -58,6 +58,7 @@ public class ExpenseLogsFragment extends Fragment {
         TableRow tableRowHeader = (TableRow) rootView.findViewById(R.id.logs_table_header);
 
         currentExpenseManager = (ExpenseManager) getArguments().get(EXPENSE_MANAGER);
+
         List<Transaction> transactionList = new ArrayList<>();
         if (currentExpenseManager != null) {
             transactionList = currentExpenseManager.getTransactionLogs();
